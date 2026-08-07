@@ -1,14 +1,14 @@
 package com.jennyfersampaio.icompras.pedidos.controller;
 
+import com.jennyfersampaio.icompras.pedidos.controller.dto.AdicaoNovoPagamentoDTO;
 import com.jennyfersampaio.icompras.pedidos.controller.dto.NovoPedidoDTO;
 import com.jennyfersampaio.icompras.pedidos.controller.mappers.PedidoMapper;
 import com.jennyfersampaio.icompras.pedidos.model.ErrorResposta;
+import com.jennyfersampaio.icompras.pedidos.model.exception.ItemNaoEncontradoException;
 import com.jennyfersampaio.icompras.pedidos.model.exception.ValidationException;
 import com.jennyfersampaio.icompras.pedidos.service.PedidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +33,18 @@ public class PedidoController {
            return ResponseEntity.badRequest().body(erro);
         }
     }
+
+    @PostMapping("pagamentos")
+    public ResponseEntity<Object> adicionarNovoPagamento(@RequestBody AdicaoNovoPagamentoDTO dto){
+        try{
+            service.adicionarNovoPagamento(dto.codigoPedido(), dto.dados(), dto.tipoPagamento());
+            return ResponseEntity.noContent().build();
+        } catch (ItemNaoEncontradoException e){
+            var erro = new ErrorResposta("Item não encontrado", "codigoPedido", e.getMessage());
+            return ResponseEntity.badRequest().body(erro);
+        }
+    }
+
 
 //    @DeleteMapping("/{codigo}")
 //    public ResponseEntity<Void> deletar(@PathVariable Long codigo){
